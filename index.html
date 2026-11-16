@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Christmas Film Advent Calendar</title>
+<meta name="theme-color" content="#17223b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Film Advent">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎄</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;1,9..144,400&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+
+<script>
+/* =====================================================================
+   ✏️  EDIT THIS SECTION — everything you need to customise is here.
+   ===================================================================== */
+const CONFIG = {
+  // Shown at the top of the page. Put your person's name in recipientName
+  // (e.g. "Sophie") to get "Sophie's Christmas Film Advent Calendar".
+  recipientName: "Zoe",
+  title: "Christmas Film Advent Calendar",
+  subtitle: "A festive film for every day until Christmas",
+
+  // Films are shuffled onto days using this word. The shuffle is the same on
+  // every visit and every device. Change it (any text) to get a new shuffle,
+  // but do that BEFORE 1 December, or already-opened days will change films.
+  shuffleSeed: "snowy-christmas",
+
+  // true = door numbers are scattered around the grid like a real advent
+  // calendar; false = doors are in order 1 → 24.
+  scatterDoors: true,
+
+  // Your 24 films. For each one:
+  //   title  – the film name (required)
+  //   year   – optional
+  //   cover  – optional: an image file next to this page, e.g. "covers/elf.jpg",
+  //            or a full image link, e.g. "https://…/poster.jpg".
+  //            Leave as "" and a cute illustrated card is shown instead.
+  //   emoji  – optional: used on the illustrated card when there's no cover
+  //   note   – optional: a little message shown when the door is opened
+  films: [
+    { title: "Elf",                                    year: 2003, cover: "", emoji: "🧝" },
+    { title: "Home Alone",                             year: 1990, cover: "", emoji: "🏠" },
+    { title: "Home Alone 2: Lost in New York",         year: 1992, cover: "", emoji: "🗽" },
+    { title: "The Polar Express",                      year: 2004, cover: "", emoji: "🚂" },
+    { title: "Love Actually",                          year: 2003, cover: "", emoji: "💌" },
+    { title: "The Holiday",                            year: 2006, cover: "", emoji: "🏡" },
+    { title: "It's a Wonderful Life",                  year: 1946, cover: "", emoji: "🔔" },
+    { title: "The Muppet Christmas Carol",             year: 1992, cover: "", emoji: "🐸" },
+    { title: "Miracle on 34th Street",                 year: 1994, cover: "", emoji: "🎅" },
+    { title: "How the Grinch Stole Christmas",         year: 2000, cover: "", emoji: "💚" },
+    { title: "Arthur Christmas",                       year: 2011, cover: "", emoji: "🎁" },
+    { title: "The Nightmare Before Christmas",         year: 1993, cover: "", emoji: "🎃" },
+    { title: "Klaus",                                  year: 2019, cover: "", emoji: "✉️" },
+    { title: "Jingle All the Way",                     year: 1996, cover: "", emoji: "🤖" },
+    { title: "The Santa Clause",                       year: 1994, cover: "", emoji: "🛷" },
+    { title: "National Lampoon's Christmas Vacation",  year: 1989, cover: "", emoji: "💡" },
+    { title: "A Christmas Story",                      year: 1983, cover: "", emoji: "🦵" },
+    { title: "Nativity!",                              year: 2009, cover: "", emoji: "⭐" },
+    { title: "Last Christmas",                         year: 2019, cover: "", emoji: "❤️" },
+    { title: "The Christmas Chronicles",               year: 2018, cover: "", emoji: "🦌" },
+    { title: "Four Christmases",                       year: 2008, cover: "", emoji: "🎄" },
+    { title: "Scrooged",                               year: 1988, cover: "", emoji: "👻" },
+    { title: "Spirited",                               year: 2022, cover: "", emoji: "🎶" },
+    { title: "Die Hard",                               year: 1988, cover: "", emoji: "💥" },
+  ],
+};
+/* ===================== End of the editable section ===================== */
+</script>
+
+<style>
+  :root{
+    --night:#17223b; --night-2:#1f2d4d; --ink:#2b2a33;
+    --cream:#f8f1e7; --blush:#f3d5cd; --sage:#d3e0cf;
+    --red:#b8413f; --pine:#2f5d50; --gold:#e8b85a;
+    --radius:16px;
+  }
+  *{box-sizing:border-box}
+  html{background:var(--night-2)}
+  html,body{margin:0;min-height:100%}
+  body{
+    font-family:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
+    color:var(--cream);
+    background:
+      radial-gradient(1200px 600px at 50% -10%, #2c3d66 0%, transparent 60%),
+      linear-gradient(180deg,var(--night) 0%, var(--night-2) 100%);
+    background-attachment:fixed;
+    overflow-x:hidden;
+  }
+  #snow{position:fixed;inset:0;pointer-events:none;z-index:0}
+  .wrap{position:relative;z-index:1;max-width:880px;margin:0 auto;padding:28px 18px 60px}
+
+  header{text-align:center;margin-bottom:22px}
+  .eyebrow{font-size:.78rem;letter-spacing:.22em;text-transform:uppercase;opacity:.7;margin:0 0 8px}
+  h1{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:clamp(1.7rem,5vw,2.6rem);line-height:1.1;margin:0}
+  h1 em{font-style:italic;font-weight:400;color:var(--gold)}
+  .sub{margin:10px 0 0;opacity:.8;font-size:1rem}
+  .status{display:inline-block;margin-top:16px;padding:8px 16px;border-radius:999px;
+    background:rgba(248,241,231,.1);border:1px solid rgba(248,241,231,.18);font-weight:600;font-size:.95rem}
+
+  .grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  @media (min-width:640px){.grid{grid-template-columns:repeat(6,1fr);gap:14px}}
+
+  .cell{position:relative;aspect-ratio:3/4;perspective:900px;border:0;padding:0;background:none;
+    cursor:pointer;font:inherit;color:inherit;border-radius:var(--radius);-webkit-tap-highlight-color:transparent}
+  .cell:focus-visible{outline:3px solid var(--gold);outline-offset:3px}
+
+  /* What's behind the door */
+  .inside{position:absolute;inset:0;border-radius:var(--radius);overflow:hidden;
+    background:#0f1730;box-shadow:inset 0 0 0 2px rgba(255,255,255,.06)}
+  .inside img{width:100%;height:100%;object-fit:cover;display:block}
+  .inside .tag{position:absolute;left:6px;top:6px;min-width:22px;height:22px;padding:0 6px;border-radius:999px;
+    background:rgba(23,34,59,.82);color:var(--cream);font-size:.72rem;font-weight:700;display:grid;place-items:center}
+  .inside .cap{position:absolute;left:0;right:0;bottom:0;padding:18px 7px 7px;font-size:.68rem;font-weight:700;line-height:1.15;
+    background:linear-gradient(transparent,rgba(10,15,30,.85));display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+  /* Illustrated card used when there is no cover image */
+  .art{width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;
+    padding:10px;text-align:center;color:var(--ink)}
+  .art .e{font-size:clamp(1.6rem,6vw,2.4rem);line-height:1}
+  .art .t{font-family:"Fraunces",Georgia,serif;font-size:.72rem;font-weight:600;line-height:1.15;
+    display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+  .bg0{background:linear-gradient(160deg,#fbe9e4,#f1c9c0)}
+  .bg1{background:linear-gradient(160deg,#e6efe2,#c6d8c0)}
+  .bg2{background:linear-gradient(160deg,#fbf3e3,#f0dcb4)}
+  .bg3{background:linear-gradient(160deg,#e5ecf6,#c4d2e8)}
+
+  /* The door itself */
+  .door{position:absolute;inset:0;border-radius:var(--radius);transform-origin:left center;
+    transition:transform .95s cubic-bezier(.3,.75,.25,1), opacity .35s ease .6s;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    box-shadow:0 6px 14px rgba(0,0,0,.25), inset 0 0 0 1px rgba(0,0,0,.04);transform-style:preserve-3d}
+  .door::before{content:"";position:absolute;inset:7px;border-radius:calc(var(--radius) - 6px);
+    border:1.5px dashed currentColor;opacity:.25}
+  .door::after{content:"";position:absolute;right:10px;top:50%;width:6px;height:6px;margin-top:-3px;border-radius:50%;
+    background:currentColor;opacity:.35}
+  .t0 .door{background:var(--cream);color:var(--red)}
+  .t1 .door{background:var(--sage);color:var(--pine)}
+  .t2 .door{background:var(--blush);color:var(--red)}
+  .num{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:clamp(1.6rem,6vw,2.3rem);line-height:1}
+  .pill{margin-top:6px;font-size:.62rem;font-weight:700;letter-spacing:.12em;text-transform:uppercase;
+    padding:3px 8px;border-radius:999px;background:var(--red);color:#fff}
+  .t0 .pill,.t2 .pill{background:var(--pine)}
+  .star{position:absolute;top:8px;right:10px;font-size:.9rem}
+
+  .cell.locked .door{filter:saturate(.75) brightness(.92)}
+  .cell.today .door{animation:glow 2.4s ease-in-out infinite}
+  @keyframes glow{0%,100%{box-shadow:0 6px 14px rgba(0,0,0,.25),0 0 0 0 rgba(232,184,90,.0)}
+                  50%{box-shadow:0 6px 14px rgba(0,0,0,.25),0 0 0 6px rgba(232,184,90,.75)}}
+  .cell.open .door{transform:rotateY(-105deg);opacity:0;pointer-events:none}
+  .cell.open.instant .door{transition:none}
+  .cell.wiggle{animation:wiggle .45s ease}
+  @keyframes wiggle{20%{transform:rotate(-4deg)}40%{transform:rotate(4deg)}60%{transform:rotate(-2deg)}80%{transform:rotate(2deg)}}
+  @media (hover:hover){.cell:not(.open):not(.locked):hover .door{transform:rotateY(-12deg)}}
+
+  footer{text-align:center;margin-top:26px;font-size:.85rem;opacity:.65}
+
+  /* Toast */
+  .toast{position:fixed;left:50%;bottom:24px;transform:translate(-50%,20px);opacity:0;z-index:30;
+    background:var(--cream);color:var(--ink);padding:10px 18px;border-radius:999px;font-weight:700;font-size:.92rem;
+    box-shadow:0 10px 30px rgba(0,0,0,.35);transition:all .3s ease;pointer-events:none;max-width:90vw;text-align:center}
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+
+  /* Reveal pop-up */
+  .modal{position:fixed;inset:0;z-index:20;display:none;align-items:center;justify-content:center;padding:20px;
+    background:rgba(10,15,30,.6);backdrop-filter:blur(4px);-webkit-backdrop-filter:blur(4px)}
+  .modal.show{display:flex}
+  .card{position:relative;width:min(360px,100%);max-height:92vh;overflow:auto;background:var(--cream);color:var(--ink);
+    border-radius:22px;padding:18px 18px 22px;text-align:center;box-shadow:0 30px 60px rgba(0,0,0,.45);
+    animation:pop .45s cubic-bezier(.2,.9,.3,1.3)}
+  @keyframes pop{from{transform:scale(.85);opacity:0}to{transform:scale(1);opacity:1}}
+  .poster{width:100%;aspect-ratio:2/3;max-height:52vh;border-radius:14px;overflow:hidden;margin:0 auto 14px;
+    box-shadow:0 10px 24px rgba(0,0,0,.18)}
+  .poster img{width:100%;height:100%;object-fit:cover;display:block}
+  .poster .art .e{font-size:4.5rem}
+  .poster .art .t{font-size:1.2rem;-webkit-line-clamp:4;padding:0 10px}
+  .day-label{font-size:.75rem;letter-spacing:.18em;text-transform:uppercase;color:var(--red);font-weight:700}
+  .card h2{font-family:"Fraunces",Georgia,serif;font-weight:600;font-size:1.55rem;line-height:1.15;margin:6px 0 2px}
+  .year{opacity:.6;font-weight:600}
+  .note{margin:12px 0 0;font-style:italic;font-family:"Fraunces",Georgia,serif;color:var(--pine)}
+  .close{position:absolute;top:10px;right:10px;width:34px;height:34px;border-radius:50%;border:0;cursor:pointer;
+    background:rgba(43,42,51,.08);color:var(--ink);font-size:1.2rem;line-height:1}
+  .btn{margin-top:16px;border:0;cursor:pointer;background:var(--red);color:#fff;font:inherit;font-weight:700;
+    padding:10px 22px;border-radius:999px}
+
+  .testbar{position:relative;z-index:2;background:var(--gold);color:var(--ink);text-align:center;font-size:.85rem;
+    font-weight:700;padding:8px 12px}
+  .testbar a{color:inherit}
+
+  @media (prefers-reduced-motion:reduce){
+    .door{transition:opacity .2s}
+    .cell.today .door{animation:none}
+  }
+</style>
+</head>
+<body>
+<canvas id="snow" aria-hidden="true"></canvas>
+<div id="testbar" class="testbar" hidden></div>
+
+<main class="wrap">
+  <header>
+    <p class="eyebrow" id="eyebrow">December</p>
+    <h1 id="title"></h1>
+    <p class="sub" id="subtitle"></p>
+    <div class="status" id="status" role="status"></div>
+  </header>
+
+  <div class="grid" id="grid" aria-label="Advent calendar doors"></div>
+
+  <footer id="footer"></footer>
+</main>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="m-title">
+  <div class="card">
+    <button class="close" id="m-close" aria-label="Close">×</button>
+    <div class="poster" id="m-poster"></div>
+    <div class="day-label" id="m-day"></div>
+    <h2 id="m-title"></h2>
+    <div class="year" id="m-year"></div>
+    <p class="note" id="m-note" hidden></p>
+    <button class="btn" id="m-ok">Enjoy the film 🍿</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* Storage helper that never crashes if the browser blocks storage */
+var store = (function(){
+  const mem = {};
+  return {
+    get(k){ try { return localStorage.getItem(k); } catch(e){ return mem[k] ?? null; } },
+    set(k, v){ try { localStorage.setItem(k, v); } catch(e){ mem[k] = v; } },
+    remove(k){ try { localStorage.removeItem(k); } catch(e){ delete mem[k]; } },
+  };
+})();
+
+(function(){
+  "use strict";
+
+  /* ---------- Seeded shuffle: same order on every visit and device ---------- */
+  function hashString(str){
+    let h = 1779033703 ^ str.length;
+    for (let i = 0; i < str.length; i++){
+      h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
+      h = (h << 13) | (h >>> 19);
+    }
+    return h >>> 0;
+  }
+  function rng(seed){ // mulberry32
+    let a = hashString(seed);
+    return function(){
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  function shuffled(list, seed){
+    const out = list.slice(), r = rng(seed);
+    for (let i = out.length - 1; i > 0; i--){
+      const j = Math.floor(r() * (i + 1));
+      [out[i], out[j]] = [out[j], out[i]];
+    }
+    return out;
+  }
+
+  /* ---------- Test modes (address ends in #preview, #day-5, or #reset) ---------- */
+  const hash = (location.hash || "").replace("#", "").toLowerCase();
+  const now = new Date();
+  const year = now.getMonth() === 0 ? now.getFullYear() - 1 : now.getFullYear(); // a January visit still shows last December
+  const realKey = "film-advent-" + year;
+  const testKey = realKey + "-test";
+
+  if (hash === "reset"){
+    store.remove(realKey); store.remove(testKey);
+    history.replaceState(null, "", location.pathname + location.search);
+  }
+
+  let mode = "real", fakeDay = null;
+  if (hash === "preview") mode = "preview";
+  const m = hash.match(/^day-(\d{1,2})$/);
+  if (m){ mode = "day"; fakeDay = Math.min(31, Math.max(1, parseInt(m[1], 10))); }
+  const storageKey = mode === "real" ? realKey : testKey;
+
+  /* ---------- Saved progress (stays on this device/browser) ---------- */
+  function loadOpened(){
+    try { const v = JSON.parse(store.get(storageKey) || "[]"); return new Set(Array.isArray(v) ? v : []); }
+    catch(e){ return new Set(); }
+  }
+  function saveOpened(set){ store.set(storageKey, JSON.stringify([...set].sort((a,b)=>a-b))); }
+
+  /* ---------- Work out what "today" is ---------- */
+  // Returns the highest door number that may be opened (0 = none yet).
+  function unlockedUpTo(){
+    if (mode === "preview") return 24;
+    if (mode === "day") return Math.min(fakeDay, 24);
+    const mo = now.getMonth(), d = now.getDate();
+    if (mo === 11) return Math.min(d, 24);  // December
+    if (mo === 0) return 24;                // January: everything open
+    return 0;                               // before December
+  }
+  function todayNumber(){
+    if (mode === "day") return fakeDay <= 24 ? fakeDay : null;
+    if (mode === "preview") return null;
+    return (now.getMonth() === 11 && now.getDate() <= 24) ? now.getDate() : null;
+  }
+  function sleepsUntilDecember(){
+    const target = new Date(now.getFullYear(), 11, 1);
+    const start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    return Math.round((target - start) / 86400000);
+  }
+
+  /* ---------- Build the calendar ---------- */
+  const films = CONFIG.films.slice(0, 24);
+  if (films.length < 24) console.warn("Advent calendar: only " + films.length + " films listed; add " + (24 - films.length) + " more.");
+  const filmOrder = shuffled(films, CONFIG.shuffleSeed);
+  const filmForDay = d => filmOrder[(d - 1) % filmOrder.length] || { title: "Film to be announced", emoji: "🎬" };
+
+  const days = Array.from({length:24}, (_, i) => i + 1);
+  const layout = CONFIG.scatterDoors ? shuffled(days, CONFIG.shuffleSeed + "-doors") : days;
+
+  const opened = loadOpened();
+  const limit = unlockedUpTo();
+  const today = todayNumber();
+  const grid = document.getElementById("grid");
+
+  const fmtDate = d => d + " December";
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;" }[c]));
+
+  function artHTML(film, day){
+    return '<div class="art bg' + (day % 4) + '"><div class="e">' + esc(film.emoji || "🎄") +
+           '</div><div class="t">' + esc(film.title) + '</div></div>';
+  }
+  function coverHTML(film, day){
+    if (!film.cover) return artHTML(film, day);
+    return '<img src="' + esc(film.cover) + '" alt="" loading="lazy" data-day="' + day + '">';
+  }
+  // If a cover image fails to load, swap in the illustrated card.
+  document.addEventListener("error", e => {
+    const img = e.target;
+    if (img.tagName === "IMG" && img.dataset.day){
+      img.outerHTML = artHTML(filmForDay(+img.dataset.day), +img.dataset.day);
+    }
+  }, true);
+
+  function insideHTML(day){
+    const film = filmForDay(day);
+    const label = film.cover ? '<div class="cap">' + esc(film.title) + '</div>' : "";
+    return coverHTML(film, day) + '<span class="tag">' + day + '</span>' + label;
+  }
+
+  layout.forEach((day, i) => {
+    const cell = document.createElement("button");
+    cell.type = "button";
+    cell.className = "cell t" + (i % 3);
+    cell.dataset.day = day;
+    cell.innerHTML =
+      '<div class="inside"></div>' +
+      '<div class="door"><span class="num">' + day + '</span>' +
+      (day === today ? '<span class="pill">Today</span>' : "") +
+      (day === 24 ? '<span class="star" aria-hidden="true">⭐</span>' : "") + '</div>';
+    if (day > limit) cell.classList.add("locked");
+    if (day === today) cell.classList.add("today");
+    if (opened.has(day) && day <= limit){
+      cell.classList.add("open", "instant");
+      cell.querySelector(".inside").innerHTML = insideHTML(day);
+    }
+    setLabel(cell, day);
+    cell.addEventListener("click", () => onDoor(cell, day));
+    grid.appendChild(cell);
+  });
+
+  function setLabel(cell, day){
+    const isOpen = cell.classList.contains("open");
+    cell.setAttribute("aria-label", isOpen ? ("Day " + day + ": " + filmForDay(day).title)
+      : (day > limit ? "Day " + day + ", locked" : "Open door " + day));
+  }
+
+  function onDoor(cell, day){
+    if (cell.classList.contains("open")) return showFilm(day);
+    if (day > limit){
+      cell.classList.remove("wiggle"); void cell.offsetWidth; cell.classList.add("wiggle");
+      const msgs = ["No peeking! 👀", "Patience, little elf 🧝", "Not yet! ❄️", "Nice try 🎅"];
+      toast(msgs[day % msgs.length] + " This door opens on " + fmtDate(day) + ".");
+      return;
+    }
+    cell.querySelector(".inside").innerHTML = insideHTML(day);
+    cell.classList.remove("instant");
+    requestAnimationFrame(() => cell.classList.add("open"));
+    opened.add(day); saveOpened(opened);
+    setLabel(cell, day); updateFooter();
+    setTimeout(() => showFilm(day), 750);
+  }
+
+  /* ---------- Pop-up ---------- */
+  const modal = document.getElementById("modal");
+  let lastFocus = null;
+  function showFilm(day){
+    const film = filmForDay(day);
+    lastFocus = document.activeElement;
+    document.getElementById("m-poster").innerHTML = coverHTML(film, day);
+    document.getElementById("m-day").textContent = "Day " + day + " · " + fmtDate(day);
+    document.getElementById("m-title").textContent = film.title;
+    document.getElementById("m-year").textContent = film.year || "";
+    const note = document.getElementById("m-note");
+    note.hidden = !film.note; note.textContent = film.note || "";
+    modal.classList.add("show");
+    document.getElementById("m-ok").focus();
+  }
+  function closeModal(){
+    modal.classList.remove("show");
+    if (lastFocus) lastFocus.focus();
+  }
+  document.getElementById("m-close").onclick = closeModal;
+  document.getElementById("m-ok").onclick = closeModal;
+  modal.addEventListener("click", e => { if (e.target === modal) closeModal(); });
+  document.addEventListener("keydown", e => { if (e.key === "Escape" && modal.classList.contains("show")) closeModal(); });
+
+  let toastTimer;
+  function toast(text){
+    const t = document.getElementById("toast");
+    t.textContent = text; t.classList.add("show");
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove("show"), 2600);
+  }
+
+  /* ---------- Header text ---------- */
+  const name = (CONFIG.recipientName || "").trim();
+  document.getElementById("title").innerHTML = name
+    ? esc(name) + "'s <em>" + esc(CONFIG.title) + "</em>"
+    : esc(CONFIG.title).replace(/(Film)/, "<em>$1</em>");
+  document.getElementById("subtitle").textContent = CONFIG.subtitle;
+  document.getElementById("eyebrow").textContent = "December " + year;
+
+  function statusText(){
+    if (mode === "preview") return "Preview mode: every door is unlocked 🔓";
+    if (limit === 0){
+      const n = sleepsUntilDecember();
+      return n === 1 ? "Just 1 sleep until the first door! 🎄" : n + " sleeps until the first door 🎄";
+    }
+    if (!today) return "Merry Christmas! 🎄 Every door is open to you.";
+    if (opened.has(today)) return today === 24 ? "Christmas Eve! ✨ See you on the sofa." : "Come back tomorrow for door " + (today + 1) + " ❄️";
+    return "It's " + fmtDate(today) + " — door " + today + " is waiting 🎁";
+  }
+  function updateFooter(){
+    document.getElementById("footer").textContent = "Opened " + opened.size + " of 24 doors";
+    document.getElementById("status").textContent = statusText();
+  }
+  updateFooter();
+
+  if (mode !== "real"){
+    const bar = document.getElementById("testbar");
+    bar.hidden = false;
+    bar.innerHTML = (mode === "preview" ? "Preview mode (all doors unlocked)" : "Test mode: pretending it's " + fmtDate(fakeDay)) +
+      ". Doors opened here aren't saved to the real calendar. <a href='#' id='exit'>Exit</a> · <a href='#reset' id='rst'>Reset all</a>";
+    document.getElementById("exit").onclick = e => { e.preventDefault(); location.hash = ""; location.reload(); };
+    document.getElementById("rst").onclick = e => { e.preventDefault(); location.hash = "reset"; location.reload(); };
+  }
+  window.addEventListener("hashchange", () => location.reload());
+
+  /* ---------- Gentle snowfall ---------- */
+  const canvas = document.getElementById("snow"), ctx = canvas.getContext("2d");
+  const reduce = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  let flakes = [], W = 0, H = 0, dpr = 1;
+  function resize(){
+    dpr = Math.min(window.devicePixelRatio || 1, 2);
+    W = innerWidth; H = innerHeight;
+    canvas.width = W * dpr; canvas.height = H * dpr;
+    canvas.style.width = W + "px"; canvas.style.height = H + "px";
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const count = Math.round(Math.min(140, (W * H) / 9000) * (reduce ? 0.3 : 1));
+    flakes = Array.from({length: count}, () => newFlake(true));
+  }
+  function newFlake(anywhere){
+    const r = Math.random() * 2.2 + 0.8;
+    return { x: Math.random() * W, y: anywhere ? Math.random() * H : -5, r,
+             vy: (r * 0.25 + 0.2) * (reduce ? 0.4 : 1), drift: Math.random() * Math.PI * 2,
+             a: 0.35 + Math.random() * 0.55 };
+  }
+  function tick(){
+    ctx.clearRect(0, 0, W, H);
+    for (const f of flakes){
+      f.drift += 0.01; f.y += f.vy; f.x += Math.sin(f.drift) * 0.35;
+      if (f.y > H + 5) Object.assign(f, newFlake(false));
+      ctx.beginPath(); ctx.arc(f.x, f.y, f.r, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(255,255,255," + f.a + ")"; ctx.fill();
+    }
+    requestAnimationFrame(tick);
+  }
+  addEventListener("resize", resize);
+  resize(); tick();
+})();
+</script>
+</body>
+</html>
